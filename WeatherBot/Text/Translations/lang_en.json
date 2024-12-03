@@ -1,0 +1,125 @@
+{
+  "Welcome": "Hi! Send me location to get weather.\n\nCommands:",
+  "Help": {
+    "/lang": "Switch language",
+    "/help": "Show help"
+  },
+  "TimeSpan": {
+    "Days": "{0}d",
+    "Hours": "{0}h",
+    "Minutes": "{0}m",
+    "Seconds": "{0}s"
+  },
+  "Weekday": {
+    "Monday": "Mo",
+    "Tuesday": "Tu",
+    "Wednesday": "We",
+    "Thursday": "Th",
+    "Friday": "Fr",
+    "Saturday": "Sa",
+    "Sunday": "Su"
+  },
+  "Month": {
+    "January": "Jan",
+    "February": "Feb",
+    "March": "Mar",
+    "April": "Apr",
+    "May": "May",
+    "June": "Jun",
+    "July": "Jul",
+    "August": "Aug",
+    "September": "Sep",
+    "October": "Oct",
+    "November": "Nov",
+    "December": "Dec"
+  },
+  "Quota": {
+    "Reached": "You have reached quota of {0} requests per hour"
+  },
+  "Bookmark": {
+    "AskName": "Now send bookmark name",
+    "Created": "Bookmark created",
+    "Deleted": "Bookmark deleted",
+    "NameAlreadyExists": "Bookmark name must be unique",
+    "NameTooShortOrLong": "Bookmark name must be between 1 and 50 characters long",
+    "NameHasInvalidCharacters": "Bookmark name contains incorrect characters",
+    "PointAlreadyExists": "Bookmark with the same name already exists",
+    "LimitReached": "You can save up to {0} bookmarks",
+    "AlreadyDeleted": "Bookmark already deleted"
+  },
+  "FetchType": {
+    "owm_current": {
+      "ShortName": "OWM: now",
+      "FullName": "OpenWeatherMap: current weather"
+    },
+    "owm_hourly": {
+      "ShortName": "OWM: hourly",
+      "FullName": "OpenWeatherMap: hourly forecast"
+    },
+    "om_current": {
+      "ShortName": "OM: now",
+      "FullName": "Open Meteo: current weather"
+    },
+    "om_daily": {
+      "ShortName": "OM: daily",
+      "FullName": "Open Meteo: daily forecast"
+    },
+    "om_hourly": {
+      "ShortName": "OM: hourly",
+      "FullName": "Open Meteo: hourly forecast"
+    },
+    "om_heights": {
+      "ShortName": "OM: heights",
+      "FullName": "Open Meteo: hourly forecast on different heights"
+    }
+  },
+  "Weather": {
+    "Name": {
+      "ClearSky": "clear sky",
+      "PartlyCloudy": "partly cloudy",
+      "Fog": "fog",
+      "Drizzle": "drizzle",
+      "FreezingDrizzle": "freezing drizzle",
+      "Rain": "rain",
+      "FreezingRain": "freezing rain",
+      "Snowfall": "snowfall",
+      "SnowGrains": "snow grains",
+      "RainShowers": "rain showers",
+      "SnowShowers": "show showers",
+      "Thunderstorm": "thunderstorm",
+      "ThunderstormWithHail": "thunderstorm with hail"
+    },
+    "Generic": {
+      "Humidity": "Humidity: {0}%",
+      "Visibility": "Visibility: {0:F0} km",
+      "LocalTime": "Local time: {0:t}",
+      "Sunrise": "Sunrise at {0:t} (in {1})",
+      "Sunset": "Sunset at {0:t} (in {1})",
+      "SunsetAlready": "Sunset was at {0:t}"
+    },
+    "MultiHeight": {
+      "Time": "{0:HH:mm}  ",
+      "Meter": "{0}m:",
+      "Temp": "  {0:F0}\u00b0C",
+      "Wind": "  {0:0.#} m/s [{1}]"
+    },
+    "Hourly": {
+      "Day": "{0} - {2} {1}",
+      "Item": "{0:HH:mm}  {1}  {2}\u00b0C   {3:0.#} m/s ({4})"
+    },
+    "Daily": {
+      "Item": "{0:M/d} {1}  {2}  {3}\u00b0C   {4:0.#} m/s ({5})"
+    },
+    "Single": {
+      "WeatherName": "Weather: ",
+      "Temperature": "Temperature: {0}\u00b0C",
+      "WindSpeed": "Wind speed: {0:0.#} m/s (level {1})",
+      "WindGust": "Wind gusts: {0:0.#} m/s (level {1})"
+    },
+    "Misc": {
+      "SetTypePrompt": "Select type:",
+      "DefaultTypeChanged": "Weather type changed to ",
+      "CacheExpired": "The data of this message has expired"
+    }
+  }
+}

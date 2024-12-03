@@ -1,0 +1,125 @@
+﻿{
+  "Welcome": "Привет! Отправь геопозицию чтобы получить погоду.\n\nКоманды:",
+  "Help": {
+    "/lang": "Сменить язык",
+    "/help": "Показать помощь"
+  },
+  "TimeSpan": {
+    "Days": "{0}д",
+    "Hours": "{0}ч",
+    "Minutes": "{0}м",
+    "Seconds": "{0}с"
+  },
+  "Weekday": {
+    "Monday": "Пн",
+    "Tuesday": "Вт",
+    "Wednesday": "Ср",
+    "Thursday": "Чт",
+    "Friday": "Пт",
+    "Saturday": "Сб",
+    "Sunday": "Вс"
+  },
+  "Month": {
+    "January": "янв",
+    "February": "фев",
+    "March": "мар",
+    "April": "апр",
+    "May": "май",
+    "June": "июн",
+    "July": "июл",
+    "August": "авг",
+    "September": "сен",
+    "October": "окт",
+    "November": "ноя",
+    "December": "дек"
+  },
+  "Quota": {
+    "Reached": "Вы достигли квоты {0} запросов в час"
+  },
+  "Bookmark": {
+    "AskName": "Теперь отправь название закладки",
+    "Created": "Закладка успешно создана",
+    "Deleted": "Закладка удалена",
+    "NameAlreadyExists": "Название закладки должно быть уникальным",
+    "NameTooShortOrLong": "Название закладки должно быть от 1 до 50 символов",
+    "NameHasInvalidCharacters": "Название закладки содержит недопустимые символы",
+    "PointAlreadyExists": "Закладка с такой позицией уже существует",
+    "LimitReached": "Можно сохранить до {0} закладок",
+    "AlreadyDeleted": "Закладка уже удалена"
+  },
+  "FetchType": {
+    "owm_current": {
+      "ShortName": "OWM: сейчас",
+      "FullName": "OpenWeatherMap: текущая погода"
+    },
+    "owm_hourly": {
+      "ShortName": "OWM: почасовой",
+      "FullName": "OpenWeatherMap: почасовой прогноз"
+    },
+    "om_current": {
+      "ShortName": "OM: сейчас",
+      "FullName": "Open Meteo: текущая погода"
+    },
+    "om_daily": {
+      "ShortName": "OM: по дням",
+      "FullName": "Open Meteo: прогноз по дням"
+    },
+    "om_hourly": {
+      "ShortName": "OM: почасовой",
+      "FullName": "Open Meteo: почасовой прогноз"
+    },
+    "om_heights": {
+      "ShortName": "OM: высоты",
+      "FullName": "Open Meteo: почасовой прогноз на разных высотах"
+    }
+  },
+  "Weather": {
+    "Name": {
+      "ClearSky": "ясно",
+      "PartlyCloudy": "переменная облачность",
+      "Fog": "туман",
+      "Drizzle": "мелкий дождь",
+      "FreezingDrizzle": "моросящий мелкий дождь",
+      "Rain": "дождь",
+      "FreezingRain": "моросящий дождь",
+      "Snowfall": "снегопад",
+      "SnowGrains": "снежные зерна",
+      "RainShowers": "ливень",
+      "SnowShowers": "сильный снегопад",
+      "Thunderstorm": "гроза",
+      "ThunderstormWithHail": "гроза и град"
+    },
+    "Generic": {
+      "Humidity": "Влажность: {0}%",
+      "Visibility": "Видимость: {0:F0} км",
+      "LocalTime": "Местное время: {0:t}",
+      "Sunrise": "Восход в {0:t} (через {1})",
+      "Sunset": "Закат в {0:t} (через {1})",
+      "SunsetAlready": "Закат был в {0:t}"
+    },
+    "MultiHeight": {
+      "Time": "{0:HH:mm}  ",
+      "Meter": "{0}м:",
+      "Temp": "  {0:F0}\u00b0C",
+      "Wind": "  {0:0.#} м/c [{1}]"
+    },
+    "Hourly": {
+      "Day": "{0} - {1} {2}",
+      "Item": "{0:HH:mm}  {1}  {2}\u00b0C   {3:0.#} м/с ({4})"
+    },
+    "Daily": {
+      "Item": "{0:d/M} {1}  {2}  {3}\u00b0C   {4:0.#} м/с ({5})"
+    },
+    "Single": {
+      "WeatherName": "Погода: ",
+      "Temperature": "Температура: {0}\u00b0C",
+      "WindSpeed": "Ветер: {0:0.#} м/c ({1} уровень)",
+      "WindGust": "Порывы: {0:0.#} м/c ({1} уровень)"
+    },
+    "Misc": {
+      "SetTypePrompt": "Выбери тип:",
+      "DefaultTypeChanged": "Тип погоды изменен на ",
+      "CacheExpired": "Данные этого сообщения просрочены"
+    }
+  }
+}

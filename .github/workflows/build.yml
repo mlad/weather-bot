@@ -1,0 +1,40 @@
+name: Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+
+    strategy:
+      matrix:
+        runtime: [ linux-x64, linux-arm64 ]
+
+    steps:
+      # Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Setup .NET
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0.x
+
+      # Publish the app
+      - name: Build
+        run: |
+          dotnet publish ./WeatherBot/WeatherBot.csproj -r ${{ matrix.runtime }} -p:PublishSingleFile=true --self-contained false -o publish/${{ matrix.runtime }}
+
+      # Zip the build output
+      - name: Zip
+        run: |
+          zip -r weather-bot-${{ matrix.runtime }}.zip publish/${{ matrix.runtime }}
+
+      # Upload the zip as an artifact
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: weather-bot-${{ matrix.runtime }}
+          path: weather-bot-${{ matrix.runtime }}.zip
