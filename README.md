@@ -1,0 +1,51 @@
+# Weather Bot
+
+Weather bot for Telegram Messenger with multiple APIs and bookmarks support.
+
+![image](https://github.com/user-attachments/assets/de74b22c-b5d9-449c-beff-c489bf36bce5)
+
+## Features
+
+- Multiple APIs support:
+    - [Open Weather Map](https://openweathermap.org/api) (free, token required)
+    - [Open Meteo](https://open-meteo.com/) (free, no token required)
+- Different report types:
+    - Open Weather Map
+        - Current weather
+        - 3-hour forecast 5 days
+    - Open Meteo
+        - Current weather
+        - 7 days forecast
+        - 3-hour forecast 7 days
+        - Hourly forecast on different heights (10m, 80m, 120m and 180m)
+- Weather by location (using built-in Telegram location sharing)
+- Beaufort Scale wind level display
+- Per-user bookmarks
+- Per-user quotas on API requests
+- Multiple languages support. Currently translated to:
+    - English
+    - Russian
+- API responses caching
+
+## Usage
+
+1. Install [.NET 8](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) for your platform
+2. Download the latest release or build it yourself, unpack the archive
+3. Run `WeatherBot` (Linux) or `WeatherBot.exe` (Windows), the app will create `configuration.json` file and exit
+4. Open created configuration file and fill the following properties:
+    - `TelegramBotToken` with a Telegram bot API token (can be obtained from [@BotFather](https://t.me/BotFather) bot)
+    - `OpenWeatherMap:ApiToken` with Open Weather Map API token (register [here](https://home.openweathermap.org/users/sign_up)), or completely remove `OpenWeatherMap` section
+5. Run the application again. If authorization is successful, console will display "Logged-in as {bot name}"
+6. Send `/start` or `/help` to the bot to get list of commands. Share a location to get weather
+
+## Build
+
+1. Install [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) for your platform
+2. In project directory, run `dotnet publish ./WeatherBot/WeatherBot.csproj`
+3. Binaries will be located in `./WeatherBot/bin/Release/net8.0/publish`
+
+## Planned features
+
+- [ ] Text location search (using [Open Meteo Geocoding API](https://open-meteo.com/en/docs/geocoding-api))
+- [ ] Support for more APIs
+- [ ] Per-user throttling
