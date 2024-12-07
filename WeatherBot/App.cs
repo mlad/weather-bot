@@ -30,8 +30,7 @@ internal class App
 
     private async Task MainAsync()
     {
-        Config = AppConfiguration.ReadOrCreate();
-        Config.Validate();
+        Config = AppConfiguration.Initialize();
 
         Database = new SQLiteConnection("database.db", storeDateTimeAsTicks: false);
         Database.CreateTable<BotUserEntity>();

@@ -113,9 +113,10 @@ public static class WeatherCommands
         else
         {
             var requestsInHour = WeatherLog.Count(user.Id, TimeSpan.FromHours(1));
-            if (requestsInHour >= user.RequestsQuota)
+            var requestsQuota = user.RequestsQuota ?? App.Config.Users.DefaultRequestsQuota;
+            if (requestsInHour >= requestsQuota)
             {
-                await App.Bot.SendMessage(chat, Translator.Format(user.Language, "Quota:Reached", user.RequestsQuota));
+                await App.Bot.SendMessage(chat, Translator.Format(user.Language, "Quota:Reached", requestsQuota));
                 return;
             }
 

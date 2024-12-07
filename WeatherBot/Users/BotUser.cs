@@ -12,7 +12,7 @@ public class BotUser(BotUserEntity entity)
     public string? Name { get; set; } = entity.Name;
     public string Language { get; set; } = entity.Language;
     public WeatherReportType WeatherType { get; set; } = entity.DefaultWeatherType;
-    public int RequestsQuota { get; set; } = entity.RequestsQuota;
+    public int? RequestsQuota { get; set; } = entity.RequestsQuota;
 
     public static BotUser GetOrCreate(User telegramUser)
     {
@@ -28,8 +28,8 @@ public class BotUser(BotUserEntity entity)
                 Id = telegramUser.Id,
                 Name = telegramUser.Username,
                 Language = language,
-                DefaultWeatherType = WeatherReportType.OpenWeatherMapCurrent,
-                RequestsQuota = 5
+                DefaultWeatherType = App.Config.Users.DefaultReportType,
+                RequestsQuota = null
             };
 
             App.Database.Insert(entity);
