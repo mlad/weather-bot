@@ -55,6 +55,12 @@ public static class WeatherReportTypeExtensions
         }
     };
 
+    public static readonly string[][] ButtonOrder =
+    [
+        ["owm_current", "owm_hourly", "om_daily"],
+        ["om_current", "om_hourly", "om_heights"]
+    ];
+
     public static string GetKey(this WeatherReportType value) => TypeToKey[value];
 
     public static WeatherReportTypeDefinition GetDefinition(this WeatherReportType value) => All[TypeToKey[value]];

@@ -11,7 +11,7 @@ using WeatherBot.Users;
 using WeatherBot.Users.Database;
 using WeatherBot.Weather;
 using WeatherBot.Weather.Database;
-using WeatherBot.Weather.Models;
+using Emoji = WeatherBot.Text.Emoji;
 
 namespace WeatherBot;
 
@@ -20,8 +20,6 @@ internal class App
     public static SQLiteConnection Database { get; private set; } = default!;
     public static AppConfiguration Config { get; private set; } = default!;
     public static TelegramBotClient Bot { get; private set; } = default!;
-
-    public static readonly string[] AvailableCommands = ["/lang", "/help"];
 
     private static void Main()
     {
@@ -45,7 +43,10 @@ internal class App
 
         foreach (var lang in Translator.AllLanguages)
         {
-            await Bot.SetMyCommands(GetBotCommands(lang), languageCode: lang);
+            await Bot.SetMyCommands(
+                [new BotCommand { Command = "/help", Description = Translator.Get(lang, "HelpCommand") }],
+                languageCode: lang
+            );
         }
 
         var isCancelled = false;
@@ -60,37 +61,36 @@ internal class App
 
     private async Task OnMessage(Message message, BotUser user)
     {
-        var args = message.Text?.Split(' ') ?? [];
-
-        switch (args.ElementAtOrDefault(0))
+        if (message.Location != null)
         {
-            case "/start":
-            case "/help":
-                await BotUserCommands.Help(user, message);
+            await WeatherCommands.LocationMessage(user, message);
+            return;
+        }
+
+        if (string.IsNullOrEmpty(message.Text)) return;
+
+        switch (message.Text[0])
+        {
+            case '/' when message.Text is "/start" or "/help":
+                await BotUserCommands.HelpCommand(user, message);
                 break;
-            case "/lang":
-                await BotUserCommands.Lang(user, message, args);
+            case '/' when Config.AdminsIds.Contains(user.Id):
+            {
+                var args = message.Text.Split(' ');
+                if (args[0] == "/setquota")
+                {
+                    await BotUserCommands.SetQuotaCommand(message, args);
+                }
+
                 break;
-            case "/setquota" when Config.AdminsIds.Contains(user.Id):
-                await BotUserCommands.SetQuota(message, args);
-                break;
-            case null when message.Location is not null:
-                await WeatherCommands.LocationMessage(user, message);
+            }
+            case BookmarkConfiguration.Prefix:
+                await WeatherCommands.BookmarkMessage(user, message);
                 break;
             default:
-            {
-                if (string.IsNullOrEmpty(message.Text)) break;
-
-                if (message.Text.StartsWith('/'))
+                if (message.Text == Emoji.Cog)
                 {
-                    if (WeatherReportTypeExtensions.TryParse(message.Text[1..], out var type))
-                    {
-                        await BotUserCommands.SetWeatherType(user, message, type);
-                    }
-                }
-                else if (message.Text.StartsWith(BookmarkConfiguration.Prefix))
-                {
-                    await WeatherCommands.BookmarkMessage(user, message);
+                    await BotUserCommands.SettingsCommand(user, message);
                 }
                 else
                 {
@@ -98,7 +98,6 @@ internal class App
                 }
 
                 break;
-            }
         }
     }
 
@@ -123,6 +122,12 @@ internal class App
             case "DeleteBookmark":
                 await BookmarkCommands.Delete(user, query, args);
                 break;
+            case "SetDefaultReportType":
+                await BotUserCommands.SetDefaultReportTypeCallback(user, query, args);
+                break;
+            case "SetLanguage":
+                await BotUserCommands.SetLanguageCallback(user, query, args);
+                break;
         }
     }
 
@@ -130,16 +135,19 @@ internal class App
     {
         var bookmarks = BookmarkEntity.List(userId);
 
-        return bookmarks.Count != 0
-            ? new ReplyKeyboardMarkup
-            {
-                Keyboard = bookmarks
-                    .Chunk(Config.Bookmarks.BookmarksPerRow)
-                    .Select(row => row.Select(x => new KeyboardButton(BookmarkConfiguration.Prefix + x.Name))),
-                ResizeKeyboard = true,
-                IsPersistent = true
-            }
-            : new ReplyKeyboardRemove();
+        IEnumerable<KeyboardButton> buttons =
+        [
+            .. bookmarks.Select(x => new KeyboardButton(BookmarkConfiguration.Prefix + x.Name)),
+            KeyboardButton.WithRequestLocation(Emoji.Pin),
+            new(Emoji.Cog)
+        ];
+
+        return new ReplyKeyboardMarkup
+        {
+            Keyboard = buttons.Chunk(Config.Bookmarks.BookmarksPerRow),
+            ResizeKeyboard = true,
+            IsPersistent = true
+        };
     }
 
     private async Task OnMessageHandler(Message message, UpdateType type)
@@ -210,20 +218,5 @@ internal class App
                 }
             }
         }
-    }
-
-    private static IEnumerable<BotCommand> GetBotCommands(string lang)
-    {
-        return WeatherReportTypeExtensions.All.Keys
-            .Select(key => new BotCommand
-            {
-                Command = $"/{key}",
-                Description = Translator.Get(lang, $"FetchType:{key}:ShortName")
-            })
-            .Concat(AvailableCommands.Select(command => new BotCommand
-            {
-                Command = command,
-                Description = Translator.Get(lang, $"Help:{command}")
-            }));
     }
 }

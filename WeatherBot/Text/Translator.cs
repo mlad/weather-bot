@@ -15,7 +15,7 @@ public static class Translator
         Strings["en"] = ReadLanguageResource("WeatherBot.Text.Translations.lang_en.json");
         Strings["ru"] = ReadLanguageResource("WeatherBot.Text.Translations.lang_ru.json");
 
-        AllLanguages = Strings.Keys.ToArray();
+        AllLanguages = Strings.Keys.Order().ToArray();
 
         foreach (var key in Strings.SelectMany(x => x.Value).Select(x => x.Key).Distinct())
         {

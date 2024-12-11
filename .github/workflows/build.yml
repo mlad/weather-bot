@@ -16,22 +16,18 @@ jobs:
         runtime: [ win-x64, linux-x64, linux-arm64 ]
 
     steps:
-      # Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Setup .NET
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 8.0.x
 
-      # Publish the app
       - name: Build
         run: |
           dotnet publish ./WeatherBot/WeatherBot.csproj -r ${{ matrix.runtime }} -p:PublishSingleFile=true --self-contained false -o publish/${{ matrix.runtime }}
 
-      # Upload the zip as an artifact
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:

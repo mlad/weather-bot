@@ -1,8 +1,18 @@
 {
-  "Welcome": "Hi! Send me location to get weather.\n\nCommands:",
-  "Help": {
-    "/lang": "Switch language",
-    "/help": "Show help"
+  "Welcome": "Hi! Send me location to get weather",
+  "HelpCommand": "Help / fix menu",
+  "Settings": {
+    "Title": "Settings:",
+    "SetDefaultReportType": {
+      "Button": "Report type",
+      "Title": "Select report type, which will be used when getting weather by location:",
+      "Result": "Report type changed to "
+    },
+    "SetLanguage": {
+      "Button": "Language",
+      "Title": "Select language:",
+      "Result": "Language changed to english"
+    }
   },
   "TimeSpan": {
     "Days": "{0}d",
@@ -118,7 +128,6 @@
     },
     "Misc": {
       "SetTypePrompt": "Select type:",
-      "DefaultTypeChanged": "Weather type changed to ",
       "CacheExpired": "The data of this message has expired"
     }
   }

@@ -61,12 +61,11 @@ public static class WeatherCommands
             query.Message!.Chat,
             Translator.Get(user.Language, "Weather:Misc:SetTypePrompt"),
             replyMarkup: new InlineKeyboardMarkup(
-                WeatherReportTypeExtensions.All
-                    .Chunk(3)
-                    .Select(chunk => chunk.Select(x => new InlineKeyboardButton
+                WeatherReportTypeExtensions.ButtonOrder
+                    .Select(row => row.Select(key => new InlineKeyboardButton
                     {
-                        Text = Translator.Get(user.Language, $"FetchType:{x.Key}:ShortName"),
-                        CallbackData = $"Weather {request.With(x.Value.Type)}"
+                        Text = Translator.Get(user.Language, $"FetchType:{key}:ShortName"),
+                        CallbackData = $"Weather {request.With(WeatherReportTypeExtensions.All[key].Type)}"
                     }))
             )
         );

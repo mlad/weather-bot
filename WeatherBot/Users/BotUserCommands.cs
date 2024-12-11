@@ -1,6 +1,7 @@
 ﻿using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 using WeatherBot.Text;
 using WeatherBot.Weather.Models;
 
@@ -8,16 +9,29 @@ namespace WeatherBot.Users;
 
 public static class BotUserCommands
 {
-    public static async Task Help(BotUser user, Message message)
+    #region Commands
+
+    public static async Task HelpCommand(BotUser user, Message message)
     {
         await App.Bot.SendMessage(
             message.Chat,
-            GetWelcomeMessage(user.Language),
+            Translator.Get(user.Language, "Welcome"),
             replyMarkup: App.GetMainMenuMarkup(user.Id)
         );
     }
 
-    public static async Task SetQuota(Message message, string[] args)
+    public static async Task SettingsCommand(BotUser user, Message message)
+    {
+        await App.Bot.SendMessage(
+            message.Chat,
+            Translator.Get(user.Language, "Settings:Title"),
+            replyMarkup: new InlineKeyboardMarkup()
+                .AddButton(Translator.Get(user.Language, "Settings:SetDefaultReportType:Button"), "SetDefaultReportType")
+                .AddButton(Translator.Get(user.Language, "Settings:SetLanguage:Button"), "SetLanguage")
+        );
+    }
+
+    public static async Task SetQuotaCommand(Message message, string[] args)
     {
         var username = args.ElementAtOrDefault(1);
         var quotaStr = args.ElementAtOrDefault(2);
@@ -36,61 +50,76 @@ public static class BotUserCommands
         await App.Bot.SendMessage(message.Chat, $"Changed @{username} quota to {quota}");
     }
 
-    public static async Task Lang(BotUser user, Message message, string[] args)
-    {
-        var target = args.ElementAtOrDefault(1);
+    #endregion
 
-        int index;
-        if (string.IsNullOrEmpty(target))
+    #region Callbacks
+
+    public static async Task SetDefaultReportTypeCallback(BotUser user, CallbackQuery query, string[] args)
+    {
+        if (args.Length != 2)
         {
-            index = Array.IndexOf(Translator.AllLanguages, user.Language) + 1;
-            if (index == Translator.AllLanguages.Length)
-                index = 0;
+            await App.Bot.EditMessageText(
+                query.Message!.Chat,
+                query.Message.MessageId,
+                Translator.Get(user.Language, "Settings:SetDefaultReportType:Title"),
+                replyMarkup: new InlineKeyboardMarkup(
+                    WeatherReportTypeExtensions.ButtonOrder.Select(row => row.Select(key =>
+                        new InlineKeyboardButton(Translator.Get(user.Language, $"FetchType:{key}:ShortName"))
+                        {
+                            CallbackData = $"SetDefaultReportType {key}"
+                        })
+                    )
+                )
+            );
         }
         else
         {
-            index = Array.IndexOf(Translator.AllLanguages, target);
-            if (index == -1)
-                throw new UserException($"Available languages: {string.Join(", ", Translator.AllLanguages)}");
+            if (!WeatherReportTypeExtensions.TryParse(args[1], out var type))
+                throw new Exception($"Unknown weather report type: {args[1]}");
+
+            user.WeatherType = type;
+            user.Update();
+
+            var sb = new TranslatedBuilder(user.Language);
+            sb.Add("Settings:SetDefaultReportType:Result");
+            sb.AddRaw("<b>");
+            sb.Add($"FetchType:{user.WeatherType.GetKey()}:FullName");
+            sb.AddRaw("</b>");
+
+            await App.Bot.EditMessageText(query.Message!.Chat, query.Message.MessageId, sb.ToString(), ParseMode.Html);
         }
-
-        user.Language = Translator.AllLanguages[index];
-        user.Update();
-
-        await App.Bot.SendMessage(message.Chat, GetWelcomeMessage(user.Language));
     }
 
-    public static async Task SetWeatherType(BotUser user, Message message, WeatherReportType type)
+    public static async Task SetLanguageCallback(BotUser user, CallbackQuery query, string[] args)
     {
-        user.WeatherType = type;
-        user.Update();
+        if (args.Length != 2)
+        {
+            await App.Bot.EditMessageText(
+                query.Message!.Chat,
+                query.Message.MessageId,
+                Translator.Get(user.Language, "Settings:SetLanguage:Title"),
+                replyMarkup: new InlineKeyboardMarkup(
+                    Translator.AllLanguages.Select(x =>
+                        new InlineKeyboardButton(x.ToUpper()) { CallbackData = $"SetLanguage {x}" }
+                    )
+                )
+            );
+        }
+        else
+        {
+            if (!Translator.AllLanguages.Contains(args[1]))
+                throw new Exception($"Unknown language: {args[1]}");
 
-        var sb = new TranslatedBuilder(user.Language);
-        sb.Add("Weather:Misc:DefaultTypeChanged");
-        sb.AddRaw("<b>");
-        sb.Add($"FetchType:{user.WeatherType.GetKey()}:FullName");
-        sb.AddRaw("</b>");
+            user.Language = args[1];
+            user.Update();
 
-        await App.Bot.SendMessage(message.Chat, sb.ToString(), parseMode: ParseMode.Html);
+            await App.Bot.EditMessageText(
+                query.Message!.Chat,
+                query.Message.MessageId,
+                Translator.Get(user.Language, "Settings:SetLanguage:Result")
+            );
+        }
     }
 
-    private static string GetWelcomeMessage(string lang)
-    {
-        var sb = new TranslatedBuilder(lang);
-        sb.AddLine("Welcome");
-
-        foreach (var key in WeatherReportTypeExtensions.All.Keys)
-        {
-            sb.AddRaw($"/{key} - ");
-            sb.AddLine($"FetchType:{key}:FullName");
-        }
-
-        foreach (var command in App.AvailableCommands)
-        {
-            sb.AddRaw($"{command} - ");
-            sb.AddLine($"Help:{command}");
-        }
-
-        return sb.ToString();
-    }
+    #endregion
 }

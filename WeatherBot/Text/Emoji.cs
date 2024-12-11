@@ -17,4 +17,6 @@ public static class Emoji
     public const string TrashBin = "\ud83d\uddd1"; // 🗑
     public const string Refresh = "\ud83d\udd04"; // 🔄
     public const string TwistedArrows = "\ud83d\udd00"; // 🔀
+    public const string Pin = "\ud83d\udccd"; // 📍
+    public const string Cog = "\u2699\ufe0f"; // ⚙️
 }
