@@ -22,7 +22,7 @@ public class WeatherLog
 
     public static WeatherLog? TryGet(WeatherParams request)
     {
-        var minDate = DateTimeOffset.UtcNow.AddMinutes(-App.Config.Weather.CacheLifetimeMinutes);
+        var minDate = DateTime.UtcNow.AddMinutes(-App.Config.Weather.CacheLifetimeMinutes);
 
         var entities = App.Database.Table<WeatherLogEntity>()
             .Where(x => x.Type == request.Type && x.DateTimeUtc > minDate)
