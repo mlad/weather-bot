@@ -49,12 +49,9 @@ internal class App
             );
         }
 
-        var isCancelled = false;
-        Console.CancelKeyPress += (_, _) => isCancelled = true;
-        while (!isCancelled)
-        {
-            await Task.Delay(1000);
-        }
+        var exitEvent = new ManualResetEvent(false);
+        AppDomain.CurrentDomain.ProcessExit += (_, _) => exitEvent.Set();
+        exitEvent.WaitOne();
 
         Database.Dispose();
     }
