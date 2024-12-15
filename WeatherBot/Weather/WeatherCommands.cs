@@ -1,4 +1,5 @@
-﻿using Telegram.Bot;
+﻿using System.Text;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 using WeatherBot.Bookmarks.Database;
@@ -94,6 +95,25 @@ public static class WeatherCommands
         );
     }
 
+    public static async Task WeatherInfoCallback(BotUser user, CallbackQuery query, string[] args)
+    {
+        if (!int.TryParse(args.ElementAtOrDefault(1), out var cacheId))
+        {
+            throw new Exception($"Unexpected data for WeatherInfo: {query.Data}");
+        }
+
+        var cached = WeatherLog.TryGet(cacheId) ?? throw new UserException("!Weather:Misc:CacheExpired");
+
+        var sb = new StringBuilder();
+        sb.AppendLine(user.Translate($"FetchType:{cached.Request.Type.GetKey()}:FullName"));
+        sb.Append(cached.DateTimeUtc.Add(cached.Response.UtcOffset).ToString(user.Culture));
+        sb.AppendLine($" UTC+{cached.Response.UtcOffset.Hours:00}:{cached.Response.UtcOffset.Minutes:00}");
+        sb.AppendLine();
+        sb.AppendLine($"[id:{cached.Id} lat:{cached.Request.Lat} lon:{cached.Request.Lon}]");
+
+        await App.Bot.AnswerCallbackQuery(query.Id, sb.ToString(), showAlert: true);
+    }
+
     #endregion
 
     #region Private
@@ -151,6 +171,8 @@ public static class WeatherCommands
             ? new InlineKeyboardButton(Emoji.Star) { CallbackData = $"AddBookmark {weather.Request}" }
             : new InlineKeyboardButton(Emoji.TrashBin) { CallbackData = $"DeleteBookmark {bookmarkId}" }
         );
+
+        markup.AddButton(Emoji.Info, $"WeatherInfo {weather.Id}");
 
         return markup;
     }

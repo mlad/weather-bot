@@ -1,4 +1,5 @@
-﻿using Telegram.Bot.Types;
+﻿using System.Globalization;
+using Telegram.Bot.Types;
 using WeatherBot.Text;
 using WeatherBot.Users.Database;
 using WeatherBot.Weather.Models;
@@ -13,6 +14,10 @@ public class BotUser(BotUserEntity entity)
     public string Language { get; set; } = entity.Language;
     public WeatherReportType WeatherType { get; set; } = entity.DefaultWeatherType;
     public int? RequestsQuota { get; set; } = entity.RequestsQuota;
+
+    public CultureInfo Culture => Translator.GetCulture(Language);
+    public string Translate(string key) => Translator.Get(Language, key);
+    public string Translate(string key, params object?[] args) => Translator.Format(Language, key, args);
 
     public static BotUser GetOrCreate(User telegramUser)
     {

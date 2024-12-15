@@ -49,12 +49,12 @@ public static class BookmarkCommands
         await App.Bot.AnswerCallbackQuery(query.Id, text: null);
     }
 
-    public static async Task SetName(BotUser user, Message message)
+    public static async Task<bool> SetName(BotUser user, Message message)
     {
-        if (string.IsNullOrEmpty(message.Text)) return;
+        if (string.IsNullOrEmpty(message.Text)) return false;
 
         var bookmark = BookmarkEntity.TryGet(user.Id, name: null);
-        if (bookmark is null) return;
+        if (bookmark is null) return false;
 
         bookmark.UpdateName(message.Text.Trim());
 
@@ -63,5 +63,7 @@ public static class BookmarkCommands
             Translator.Get(user.Language, "Bookmark:Created"),
             replyMarkup: App.GetMainMenuMarkup(user.Id)
         );
+
+        return true;
     }
 }

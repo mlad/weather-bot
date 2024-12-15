@@ -1,11 +1,11 @@
 {
-  "Welcome": "Hi! Send me location to get weather",
+  "Welcome": "Hi! Send place name to find it or location to get weather.",
   "HelpCommand": "Help / fix menu",
   "Settings": {
     "Title": "Settings:",
     "SetDefaultReportType": {
       "Button": "Report type",
-      "Title": "Select report type, which will be used when getting weather by location:",
+      "Title": "Select report type, which will be used when getting weather by location.\n\nOWM - Open Weather Map\nOM - Open Meteo",
       "Result": "Report type changed to "
     },
     "SetLanguage": {
@@ -130,5 +130,9 @@
       "SetTypePrompt": "Select type:",
       "CacheExpired": "The data of this message has expired"
     }
+  },
+  "Geocoding": {
+    "NoResults": "Nothing found",
+    "NameTooLong": "Query text must be up to 100 characters logs"
   }
 }

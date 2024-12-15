@@ -19,4 +19,8 @@ public static class Emoji
     public const string TwistedArrows = "\ud83d\udd00"; // 🔀
     public const string Pin = "\ud83d\udccd"; // 📍
     public const string Cog = "\u2699\ufe0f"; // ⚙️
+    public const string Info = "\u2139"; // ℹ️
+
+    public static string CountryFlag(string code) =>
+        string.Concat(code.ToUpper().Select(x => char.ConvertFromUtf32(x + 0x1F1A5)));
 }

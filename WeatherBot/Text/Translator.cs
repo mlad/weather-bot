@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Globalization;
+using System.Reflection;
 using System.Text.Json;
 
 namespace WeatherBot.Text;
@@ -9,6 +10,7 @@ public static class Translator
     public static readonly string[] AllLanguages;
 
     private static readonly Dictionary<string, Dictionary<string, string>> Strings = new();
+    private static readonly Dictionary<string, CultureInfo> Cultures = new();
 
     static Translator()
     {
@@ -16,6 +18,11 @@ public static class Translator
         Strings["ru"] = ReadLanguageResource("WeatherBot.Text.Translations.lang_ru.json");
 
         AllLanguages = Strings.Keys.Order().ToArray();
+
+        foreach (var language in AllLanguages)
+        {
+            Cultures[language] = CultureInfo.CreateSpecificCulture(language);
+        }
 
         foreach (var key in Strings.SelectMany(x => x.Value).Select(x => x.Key).Distinct())
         {
@@ -45,6 +52,11 @@ public static class Translator
     public static string Format(string lang, string key, params object?[] args)
     {
         return string.Format(Get(lang, key), args);
+    }
+
+    public static CultureInfo GetCulture(string lang)
+    {
+        return Cultures[lang];
     }
 
     private static Dictionary<string, string> ReadLanguageResource(string path)

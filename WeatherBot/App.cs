@@ -6,6 +6,8 @@ using Telegram.Bot.Types.ReplyMarkups;
 using WeatherBot.Bookmarks;
 using WeatherBot.Bookmarks.Database;
 using WeatherBot.Bookmarks.Models;
+using WeatherBot.Geocoding;
+using WeatherBot.Geocoding.Database;
 using WeatherBot.Text;
 using WeatherBot.Users;
 using WeatherBot.Users.Database;
@@ -34,6 +36,7 @@ internal class App
         Database.CreateTable<BotUserEntity>();
         Database.CreateTable<WeatherLogEntity>();
         Database.CreateTable<BookmarkEntity>();
+        Database.CreateTable<GeocodingLogEntity>();
 
         Bot = new TelegramBotClient(Config.TelegramBotToken);
         var me = await Bot.GetMe();
@@ -89,9 +92,9 @@ internal class App
                 {
                     await BotUserCommands.SettingsCommand(user, message);
                 }
-                else
+                else if (!await BookmarkCommands.SetName(user, message))
                 {
-                    await BookmarkCommands.SetName(user, message);
+                    await GeocodingCommands.Search(user, message);
                 }
 
                 break;
@@ -112,6 +115,9 @@ internal class App
                 break;
             case "WeatherPage":
                 await WeatherCommands.WeatherPageCallback(user, query, args);
+                break;
+            case "WeatherInfo":
+                await WeatherCommands.WeatherInfoCallback(user, query, args);
                 break;
             case "AddBookmark":
                 await BookmarkCommands.Add(user, query, args);
