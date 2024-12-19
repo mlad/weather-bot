@@ -1,11 +1,13 @@
 ﻿using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using WeatherBot.Bookmarks.Database;
 using WeatherBot.Text;
 using WeatherBot.Users;
 using WeatherBot.Weather.Models;
+using Emoji = WeatherBot.Text.Emoji;
 
 namespace WeatherBot.Weather;
 
@@ -91,6 +93,7 @@ public static class WeatherCommands
             query.Message.Chat,
             query.Message.MessageId,
             text: formatted.Message,
+            parseMode: ParseMode.Html,
             replyMarkup: GetWeatherMarkup(cached, formatted, bookmark?.Id)
         );
     }
@@ -149,6 +152,7 @@ public static class WeatherCommands
             chatId: chat,
             text: formatted.Message,
             replyParameters: reply,
+            parseMode: ParseMode.Html,
             replyMarkup: GetWeatherMarkup(cached, formatted, bookmark?.Id)
         );
     }

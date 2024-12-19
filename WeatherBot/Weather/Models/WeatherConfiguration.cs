@@ -16,7 +16,7 @@ public class WeatherConfiguration
     public int HourlyEveryNthHour { get; set; } = 3;
 
     // Format - daily
-    public int DailyItemsPerPage { get; set; } = 7;
+    public int DailyItemsPerPage { get; set; } = 14;
 
     public void Validate()
     {

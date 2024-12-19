@@ -27,7 +27,7 @@ public static class OpenMeteo
         using var http = new HttpClient();
         using var response = await http.GetAsync(
             $"{Endpoint}?latitude={lat}&longitude={lon}&daily=weather_code,temperature_2m_max,temperature_2m_min," +
-            $"wind_speed_10m_max,wind_gusts_10m_max&wind_speed_unit=ms&timeformat=unixtime&timezone=auto"
+            $"wind_speed_10m_max,wind_gusts_10m_max&wind_speed_unit=ms&timeformat=unixtime&timezone=auto&forecast_days=14"
         );
         await using var stream = await response.Content.ReadAsStreamAsync();
         return JsonSerializer.Deserialize<DailyResponse>(stream, JsonOptions)!.ToGeneric();
