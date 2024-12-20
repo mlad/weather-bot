@@ -2,7 +2,11 @@
 
 Weather bot for Telegram Messenger with multiple APIs and bookmarks support.
 
-![image](https://github.com/user-attachments/assets/de74b22c-b5d9-449c-beff-c489bf36bce5)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/36ac4903-dfae-4b97-bf05-755a0e5cbc3f">
+  <source media="(prefers-color-scheme: light)" srcset="https://github.com/user-attachments/assets/8ebfd0ec-c07b-42d7-b5d4-3ff7bd664e27">
+  <img alt="Bot UI preview" src="https://github.com/user-attachments/assets/8ebfd0ec-c07b-42d7-b5d4-3ff7bd664e27">
+</picture>
 
 ## Features
 
