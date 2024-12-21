@@ -23,6 +23,7 @@ Weather bot for Telegram Messenger with multiple APIs and bookmarks support.
         - 3-hour forecast 7 days
         - Hourly forecast on different heights (10m, 80m, 120m and 180m)
 - Weather by location (using built-in Telegram location sharing)
+- Text location search (using [Open Meteo Geocoding API](https://open-meteo.com/en/docs/geocoding-api))
 - Beaufort Scale wind level display
 - Per-user bookmarks
 - Per-user quotas on API requests
