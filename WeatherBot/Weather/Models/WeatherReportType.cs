@@ -3,11 +3,9 @@
 public enum WeatherReportType
 {
     // Open Weather Map
-    OpenWeatherMapCurrent,
     OpenWeatherMapHourly,
 
     // Open Meteo
-    OpenMeteoCurrent,
     OpenMeteoDaily,
     OpenMeteoHourly,
     OpenMeteoHourlyMultiHeight
@@ -17,23 +15,11 @@ public static class WeatherReportTypeExtensions
 {
     public static readonly Dictionary<string, WeatherReportTypeDefinition> All = new()
     {
-        ["owm_current"] = new WeatherReportTypeDefinition
-        {
-            Type = WeatherReportType.OpenWeatherMapCurrent,
-            Fetch = OpenWeatherMap.GetCurrent,
-            Format = (weather, lang, _, now) => weather.FormatSingle(lang, now)
-        },
         ["owm_hourly"] = new WeatherReportTypeDefinition
         {
             Type = WeatherReportType.OpenWeatherMapHourly,
-            Fetch = OpenWeatherMap.GetHourly,
+            Fetch = OpenWeatherMap.Get,
             Format = (weather, lang, page, now) => weather.FormatHourly(lang, page, now)
-        },
-        ["om_current"] = new WeatherReportTypeDefinition
-        {
-            Type = WeatherReportType.OpenMeteoCurrent,
-            Fetch = (lat, lon, _) => OpenMeteo.GetCurrent(lat, lon),
-            Format = (weather, lang, _, now) => weather.FormatSingle(lang, now)
         },
         ["om_daily"] = new WeatherReportTypeDefinition
         {
@@ -55,11 +41,9 @@ public static class WeatherReportTypeExtensions
         }
     };
 
-    public static readonly string[][] ButtonOrder =
-    [
-        ["owm_current", "owm_hourly", "om_daily"],
-        ["om_current", "om_hourly", "om_heights"]
-    ];
+    public static string[][] ButtonOrder => App.Config.OpenWeatherMap != null
+        ? [["owm_hourly", "om_hourly"], ["om_daily", "om_heights"]]
+        : [["om_hourly", "om_daily", "om_heights"]];
 
     public static string GetKey(this WeatherReportType value) => TypeToKey[value];
 

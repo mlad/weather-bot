@@ -58,17 +58,9 @@
     "AlreadyDeleted": "Закладка уже удалена"
   },
   "FetchType": {
-    "owm_current": {
-      "ShortName": "OWM: сейчас",
-      "FullName": "OpenWeatherMap: текущая погода"
-    },
     "owm_hourly": {
       "ShortName": "OWM: почасовой",
       "FullName": "OpenWeatherMap: почасовой прогноз"
-    },
-    "om_current": {
-      "ShortName": "OM: сейчас",
-      "FullName": "Open Meteo: текущая погода"
     },
     "om_daily": {
       "ShortName": "OM: по дням",

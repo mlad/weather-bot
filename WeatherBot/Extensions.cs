@@ -24,6 +24,10 @@ public static class Extensions
             ? string.Join(" ", parts)
             : time.ToString("g");
     }
+
+    public static DateTime Hour(this DateTime d) => new(d.Year, d.Month, d.Day, d.Hour, 0, 0, d.Kind);
+
+    public static DateTimeOffset Hour(this DateTimeOffset d) => new(d.Year, d.Month, d.Day, d.Hour, 0, 0, d.Offset);
 }
 
 public class UserException(string text, Exception? inner = null) : Exception(text, inner);

@@ -5,7 +5,7 @@ namespace WeatherBot.Users.Models;
 [Serializable]
 public class BotUserConfiguration
 {
-    public WeatherReportType DefaultReportType { get; set; } = WeatherReportType.OpenWeatherMapCurrent;
+    public WeatherReportType DefaultReportType { get; set; } = WeatherReportType.OpenWeatherMapHourly;
     public int DefaultRequestsQuota { get; set; } = 5;
 
     public void Validate()

@@ -59,7 +59,7 @@ internal class App
         Database.Dispose();
     }
 
-    private async Task OnMessage(Message message, BotUser user)
+    private static async Task OnMessage(Message message, BotUser user)
     {
         if (message.Location != null)
         {
@@ -101,7 +101,7 @@ internal class App
         }
     }
 
-    private async Task OnButtonPressed(CallbackQuery query, BotUser user)
+    private static async Task OnButtonPressed(CallbackQuery query, BotUser user)
     {
         var args = query.Data?.Split(' ') ?? [];
 

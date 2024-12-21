@@ -15,8 +15,7 @@ public class GenericWeatherResponse
     {
         var sb = new TranslatedBuilder(lang);
 
-        var startDate = new DateTime(now.Year, now.Month, now.Day, now.Hour, 0, 0, DateTimeKind.Utc);
-
+        var startDate = now.Hour();
         var endDate = now.Date.AddDays(1).Subtract(UtcOffset);
         if ((endDate - startDate).TotalHours < App.Config.Weather.MultiHeightItemsPerPage)
             endDate = startDate.AddHours(3);
@@ -115,6 +114,7 @@ public class GenericWeatherResponse
                     case 0:
                         sb.AddLine("Weather:Hourly:Now");
                         AppendSingleDetails(sb, item);
+                        AppendTimeDetails(sb, lang, now);
                         break;
                     case 1:
                         sb.AddLine("Weather:Hourly:Today");
@@ -143,7 +143,7 @@ public class GenericWeatherResponse
                 {
                     var time = w.Time.ToOffset(UtcOffset);
 
-                    if (time.Hour % App.Config.Weather.HourlyEveryNthHour != 0 && w.Time != startDate)
+                    if (time.Hour % App.Config.Weather.HourlyEveryNthHour != 0 && w.Time != startDate) // TODO: show average values
                         continue;
 
                     AppendHour(w, time);
@@ -197,16 +197,6 @@ public class GenericWeatherResponse
         }
 
         return new WeatherReportFormatResult(sb.ToString(), page, pageCount);
-    }
-
-    public WeatherReportFormatResult FormatSingle(string lang, DateTime now)
-    {
-        var sb = new TranslatedBuilder(lang);
-
-        AppendSingleDetails(sb, Items.First());
-        AppendTimeDetails(sb, lang, now);
-
-        return new WeatherReportFormatResult(sb.ToString(), 0, 1);
     }
 
     private void AppendTimeDetails(TranslatedBuilder sb, string lang, DateTimeOffset now)

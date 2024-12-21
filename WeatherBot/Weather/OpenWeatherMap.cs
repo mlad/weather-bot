@@ -11,20 +11,38 @@ public static class OpenWeatherMap
     private const string WeatherEndpoint = "https://api.openweathermap.org/data/2.5/weather";
     private const string ForecastEndpoint = "https://api.openweathermap.org/data/2.5/forecast";
 
-    public static async Task<GenericWeatherResponse> GetCurrent(double lat, double lon, string lang)
+    public static async Task<GenericWeatherResponse> Get(double lat, double lon, string lang)
     {
         using var http = new HttpClient();
-        using var response = await http.GetAsync(GetUrl(WeatherEndpoint, lat, lon, lang));
-        await using var stream = await response.Content.ReadAsStreamAsync();
-        return JsonSerializer.Deserialize<WeatherResponse>(stream, SerializerOptions)!.ToGeneric();
+        var items = new List<GenericWeatherItem>();
+
+        var current = await GetCurrent(http, lat, lon, lang);
+        items.Add(current.ToGeneric());
+
+        var hourly = await GetHourly(http, lat, lon, lang);
+        items.AddRange(hourly.ToGeneric());
+
+        return new GenericWeatherResponse
+        {
+            Latitude = lat,
+            Longitude = lon,
+            Items = items,
+            UtcOffset = TimeSpan.FromSeconds(hourly.City.Timezone)
+        };
     }
 
-    public static async Task<GenericWeatherResponse> GetHourly(double lat, double lon, string lang)
+    private static async Task<ForecastResponse> GetHourly(HttpClient http, double lat, double lon, string lang)
     {
-        using var http = new HttpClient();
         using var response = await http.GetAsync(GetUrl(ForecastEndpoint, lat, lon, lang));
         await using var stream = await response.Content.ReadAsStreamAsync();
-        return JsonSerializer.Deserialize<ForecastResponse>(stream, SerializerOptions)!.ToGeneric();
+        return JsonSerializer.Deserialize<ForecastResponse>(stream, SerializerOptions)!;
+    }
+
+    private static async Task<WeatherResponse> GetCurrent(HttpClient http, double lat, double lon, string lang)
+    {
+        using var response = await http.GetAsync(GetUrl(WeatherEndpoint, lat, lon, lang));
+        await using var stream = await response.Content.ReadAsStreamAsync();
+        return JsonSerializer.Deserialize<WeatherResponse>(stream, SerializerOptions)!;
     }
 
     private static string GetUrl(string endpoint, double lat, double lon, string lang)
@@ -42,28 +60,17 @@ public static class OpenWeatherMap
         public required MainModel Main { get; init; }
         public int? Visibility { get; init; }
         public required WindModel Wind { get; init; }
-        public required int Timezone { get; init; }
-        [JsonPropertyName("coord")] public required CoordinatesModel Coordinates { get; init; }
 
-        public GenericWeatherResponse ToGeneric() => new()
+        public GenericWeatherItem ToGeneric() => new()
         {
-            Latitude = Coordinates.Lat,
-            Longitude = Coordinates.Lon,
-            Items =
-            [
-                new GenericWeatherItem
-                {
-                    Time = DateTimeOffset.UtcNow,
-                    WeatherName = Weather[0].Description,
-                    WeatherIcon = Weather[0].GetEmoji(),
-                    Humidity = Main.Humidity,
-                    Visibility = Visibility,
-                    Temperature = new Dictionary<int, double> { [0] = Main.Temp },
-                    WindSpeed = new Dictionary<int, double> { [0] = Wind.Speed },
-                    WindGusts = new Dictionary<int, double> { [0] = Wind.Gust }
-                }
-            ],
-            UtcOffset = TimeSpan.FromSeconds(Timezone)
+            Time = DateTimeOffset.UtcNow.Hour(),
+            WeatherName = Weather[0].Description,
+            WeatherIcon = Weather[0].GetEmoji(),
+            Humidity = Main.Humidity,
+            Visibility = Visibility,
+            Temperature = new Dictionary<int, double> { [0] = Main.Temp },
+            WindSpeed = new Dictionary<int, double> { [0] = Wind.Speed },
+            WindGusts = new Dictionary<int, double> { [0] = Wind.Gust }
         };
     }
 
@@ -73,11 +80,8 @@ public static class OpenWeatherMap
         public required ForecastDay[] List { get; init; }
         public required CityModel City { get; init; }
 
-        public GenericWeatherResponse ToGeneric() => new()
-        {
-            Latitude = City.Coordinates.Lat,
-            Longitude = City.Coordinates.Lon,
-            Items = List.Select(d => new GenericWeatherItem
+        public IEnumerable<GenericWeatherItem> ToGeneric() =>
+            List.Select(d => new GenericWeatherItem
             {
                 Time = DateTimeOffset.FromUnixTimeSeconds(d.TimeStamp),
                 WeatherName = d.Weather[0].Description,
@@ -87,9 +91,7 @@ public static class OpenWeatherMap
                 Temperature = new Dictionary<int, double> { [0] = d.Main.Temp },
                 WindSpeed = new Dictionary<int, double> { [0] = d.Wind.Speed },
                 WindGusts = new Dictionary<int, double> { [0] = d.Wind.Gust }
-            }).ToList(),
-            UtcOffset = TimeSpan.FromSeconds(City.Timezone)
-        };
+            });
 
         [Serializable]
         public class ForecastDay
@@ -105,7 +107,6 @@ public static class OpenWeatherMap
         public class CityModel
         {
             public required int Timezone { get; init; }
-            [JsonPropertyName("coord")] public required CoordinatesModel Coordinates { get; init; }
         }
     }
 
@@ -143,9 +144,6 @@ public static class OpenWeatherMap
         public double Speed { get; init; }
         public double Gust { get; init; }
     }
-
-    [Serializable]
-    public record CoordinatesModel(double Lat, double Lon);
 }
 
 [Serializable]

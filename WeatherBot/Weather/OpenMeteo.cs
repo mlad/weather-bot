@@ -10,18 +10,6 @@ public static class OpenMeteo
     private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower };
     private const string Endpoint = "https://api.open-meteo.com/v1/forecast";
 
-    public static async Task<GenericWeatherResponse> GetCurrent(double lat, double lon)
-    {
-        using var http = new HttpClient();
-        using var response = await http.GetAsync(
-            $"{Endpoint}?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,weather_code," +
-            $"wind_speed_10m,wind_gusts_10m&hourly=visibility&wind_speed_unit=ms&timeformat=unixtime&timezone=auto" +
-            $"&forecast_days=1"
-        );
-        await using var stream = await response.Content.ReadAsStreamAsync();
-        return JsonSerializer.Deserialize<CurrentResponse>(stream, JsonOptions)!.ToGeneric();
-    }
-
     public static async Task<GenericWeatherResponse> GetDaily(double lat, double lon)
     {
         using var http = new HttpClient();
@@ -161,63 +149,6 @@ public static class OpenMeteo
 
             [JsonPropertyName("wind_gusts_10m_max")]
             public required double[] WindGusts { get; set; }
-        }
-    }
-
-    [Serializable]
-    public class CurrentResponse
-    {
-        public required double Latitude { get; set; }
-        public required double Longitude { get; set; }
-        public required int UtcOffsetSeconds { get; set; }
-        public required CurrentModel Current { get; set; }
-        public required HourlyModel Hourly { get; set; }
-
-        public GenericWeatherResponse ToGeneric()
-        {
-            var time = DateTimeOffset.FromUnixTimeSeconds(Current.Time);
-            var hour = new DateTimeOffset(time.Year, time.Month, time.Day, time.Hour, 0, 0, TimeSpan.Zero).ToUnixTimeSeconds();
-
-            return new GenericWeatherResponse
-            {
-                Latitude = Latitude,
-                Longitude = Longitude,
-                Items =
-                [
-                    new GenericWeatherItem
-                    {
-                        Time = time,
-                        WeatherName = GetWeatherName(Current.WeatherCode),
-                        WeatherIcon = GetWeatherEmoji(Current.WeatherCode),
-                        Humidity = Current.Humidity,
-                        Visibility = Hourly.Visibility[Array.FindIndex(Hourly.Time, x => x == hour)],
-                        Temperature = new Dictionary<int, double> { [2] = Current.Temperature },
-                        WindSpeed = new Dictionary<int, double> { [10] = Current.WindSpeed },
-                        WindGusts = new Dictionary<int, double> { [10] = Current.WindGusts }
-                    }
-                ],
-                UtcOffset = TimeSpan.FromSeconds(UtcOffsetSeconds)
-            };
-        }
-
-        [Serializable]
-        public class CurrentModel
-        {
-            public required int Time { get; set; }
-            public required int WeatherCode { get; set; }
-            [JsonPropertyName("temperature_2m")] public required double Temperature { get; set; }
-            [JsonPropertyName("wind_speed_10m")] public required double WindSpeed { get; set; }
-            [JsonPropertyName("wind_gusts_10m")] public required double WindGusts { get; set; }
-
-            [JsonPropertyName("relative_humidity_2m")]
-            public required int Humidity { get; set; }
-        }
-
-        [Serializable]
-        public class HourlyModel
-        {
-            public required int[] Time { get; set; }
-            public required double[] Visibility { get; set; }
         }
     }
 

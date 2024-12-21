@@ -58,17 +58,9 @@
     "AlreadyDeleted": "Bookmark already deleted"
   },
   "FetchType": {
-    "owm_current": {
-      "ShortName": "OWM: now",
-      "FullName": "OpenWeatherMap: current weather"
-    },
     "owm_hourly": {
       "ShortName": "OWM: hourly",
       "FullName": "OpenWeatherMap: hourly forecast"
-    },
-    "om_current": {
-      "ShortName": "OM: now",
-      "FullName": "Open Meteo: current weather"
     },
     "om_daily": {
       "ShortName": "OM: daily",
