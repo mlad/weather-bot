@@ -73,6 +73,10 @@
     "om_heights": {
       "ShortName": "OM: heights",
       "FullName": "Open Meteo: hourly forecast on different heights"
+    },
+    "aw_hourly": {
+      "ShortName": "AW: hourly",
+      "FullName": "AccuWeather: hourly forecast"
     }
   },
   "Weather": {

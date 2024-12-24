@@ -13,7 +13,7 @@ public class WeatherConfiguration
 
     // Format - hourly
     public int HourlyDaysPerPage { get; set; } = 3;
-    public int HourlyEveryNthHour { get; set; } = 3;
+    public int HourlyItemsPerDay { get; set; } = 8;
 
     // Format - daily
     public int DailyItemsPerPage { get; set; } = 14;
@@ -35,8 +35,8 @@ public class WeatherConfiguration
         if (HourlyDaysPerPage < 1)
             throw new Exception($"Weather: {nameof(HourlyDaysPerPage)} must be positive");
 
-        if (HourlyEveryNthHour is < 1 or > 23)
-            throw new Exception($"Weather: {nameof(HourlyEveryNthHour)} must be between 1 and 23");
+        if (HourlyItemsPerDay is < 1 or > 24)
+            throw new Exception($"Weather: {nameof(HourlyItemsPerDay)} must be between 1 and 24");
 
         if (DailyItemsPerPage < 1)
             throw new Exception($"Weather: {nameof(DailyItemsPerPage)} must be positive");

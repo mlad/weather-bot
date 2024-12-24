@@ -34,19 +34,7 @@ public class GenericWeatherResponse
         {
             sb.Add("Weather:MultiHeight:Time", item.Time.ToOffset(UtcOffset));
 
-            if (item.WeatherIcon != null)
-            {
-                sb.AddRaw($"{item.WeatherIcon} ");
-            }
-
-            if (item.WeatherName.StartsWith('!'))
-            {
-                sb.AddLine(item.WeatherName[1..]);
-            }
-            else
-            {
-                sb.AddRawLine(item.WeatherName);
-            }
+            AppendWeatherName(sb, item);
 
             if (item.Humidity != null)
             {
@@ -86,17 +74,20 @@ public class GenericWeatherResponse
         return new WeatherReportFormatResult(sb.ToString(), page, pageCount);
     }
 
-    public WeatherReportFormatResult FormatHourly(string lang, int page, DateTime now)
+    public WeatherReportFormatResult FormatHourly(string lang, int page, DateTime utcNow)
     {
         var sb = new TranslatedBuilder(lang);
 
-        var startDate = new DateTimeOffset(now.Year, now.Month, now.Day, now.Hour, 0, 0, TimeSpan.Zero);
+        var now = new DateTimeOffset(utcNow).ToOffset(UtcOffset);
+        var nowHour = now.Hour();
+
         var grouped = Items
-            .Where(x => x.Time >= startDate)
-            .GroupBy(x => x.Time.ToOffset(UtcOffset).Date)
+            .Where(x => x.Time >= nowHour)
+            .Select(x => new { LocalTime = x.Time.ToOffset(UtcOffset), Weather = x })
+            .GroupBy(x => x.LocalTime.Date)
             .ToList();
 
-        var offset = grouped[0].Key == now.Add(UtcOffset).Date ? 1 : 0; // 1 if contains today weather, 0 otherwise
+        var offset = grouped[0].First().LocalTime.Hour() == nowHour ? 1 : 0; // 1 if contains current weather, 0 otherwise
 
         var pageCount = (int)Math.Ceiling((grouped.Count - offset) / (double)App.Config.Weather.HourlyDaysPerPage) + offset;
         if (page < 0 || page >= pageCount)
@@ -104,24 +95,23 @@ public class GenericWeatherResponse
 
         if (page == 0 && offset == 1)
         {
-            using var iter = grouped[0].GetEnumerator();
-
             var idx = 0;
-            foreach (var item in grouped[0])
+            foreach (var w in grouped[0])
             {
                 switch (idx++)
                 {
                     case 0:
                         sb.AddLine("Weather:Hourly:Now");
-                        AppendSingleDetails(sb, item);
+                        AppendSingleDetails(sb, w.Weather);
                         AppendTimeDetails(sb, lang, now);
                         break;
                     case 1:
+                        sb.AddLine();
                         sb.AddLine("Weather:Hourly:Today");
-                        AppendHour(item, item.Time.ToOffset(UtcOffset));
+                        AppendHour(w.Weather, w.LocalTime);
                         break;
                     default:
-                        AppendHour(item, item.Time.ToOffset(UtcOffset));
+                        AppendHour(w.Weather, w.LocalTime);
                         break;
                 }
             }
@@ -132,21 +122,30 @@ public class GenericWeatherResponse
                          .Skip(App.Config.Weather.HourlyDaysPerPage * (page - offset) + offset)
                          .Take(App.Config.Weather.HourlyDaysPerPage))
             {
-                sb.AddLine(
-                    "Weather:Hourly:Day",
-                    Translator.Get(lang, $"Weekday:{day.Key.ToString("dddd", CultureInfo.InvariantCulture)}"),
-                    day.Key.Day,
-                    Translator.Get(lang, $"Month:{day.Key.ToString("MMMM", CultureInfo.InvariantCulture)}")
-                );
+                var nowDate = now.Date;
+
+                if (day.Key == nowDate)
+                {
+                    sb.AddLine("Weather:Hourly:Today");
+                }
+                else
+                {
+                    sb.AddLine(
+                        "Weather:Hourly:Day",
+                        Translator.Get(lang, $"Weekday:{day.Key.ToString("dddd", CultureInfo.InvariantCulture)}"),
+                        day.Key.Day,
+                        Translator.Get(lang, $"Month:{day.Key.ToString("MMMM", CultureInfo.InvariantCulture)}")
+                    );
+                }
+
+                var nth = Math.Max(1, (int)Math.Ceiling(day.Count() / (double)App.Config.Weather.HourlyItemsPerDay));
 
                 foreach (var w in day)
                 {
-                    var time = w.Time.ToOffset(UtcOffset);
-
-                    if (time.Hour % App.Config.Weather.HourlyEveryNthHour != 0 && w.Time != startDate) // TODO: show average values
+                    if (w.LocalTime.Hour % nth != 0)
                         continue;
 
-                    AppendHour(w, time);
+                    AppendHour(w.Weather, w.LocalTime);
                 }
 
                 sb.AddLine();
@@ -233,19 +232,7 @@ public class GenericWeatherResponse
     {
         sb.Add("Weather:Single:WeatherName");
 
-        if (w.WeatherIcon != null)
-        {
-            sb.AddRaw($"{w.WeatherIcon} ");
-        }
-
-        if (w.WeatherName.StartsWith('!'))
-        {
-            sb.AddLine(w.WeatherName[1..]);
-        }
-        else
-        {
-            sb.AddRawLine(w.WeatherName);
-        }
+        AppendWeatherName(sb, w);
 
         sb.AddLine("Weather:Single:Temperature", (int)Math.Round(w.Temperature.MinBy(x => x.Key).Value));
         if (w.Humidity != null)
@@ -267,6 +254,23 @@ public class GenericWeatherResponse
         sb.AddLine("Weather:Single:WindGust", gusts, WindLevel.Get(gusts));
 
         sb.AddLine();
+    }
+
+    private static void AppendWeatherName(TranslatedBuilder sb, GenericWeatherItem w)
+    {
+        if (w.WeatherIcon != null)
+        {
+            sb.AddRaw($"{w.WeatherIcon} ");
+        }
+
+        if (w.WeatherName.StartsWith('!'))
+        {
+            sb.AddLine(w.WeatherName[1..]);
+        }
+        else
+        {
+            sb.AddRawLine(w.WeatherName);
+        }
     }
 }
 

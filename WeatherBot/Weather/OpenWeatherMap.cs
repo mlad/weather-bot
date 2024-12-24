@@ -120,7 +120,7 @@ public static class OpenWeatherMap
         {
             "01" => Emoji.ClearSky, // Clear sky
             "02" => Emoji.FewClouds, // Few clouds
-            "03" => Emoji.ScatteredClouds, // Scattered clouds
+            "03" => Emoji.Cloud, // Scattered clouds
             "04" => Emoji.BrokenClouds, // Broken clouds
             "09" => Emoji.Rain, // Shower rain
             "10" => Emoji.Rain, // Rain

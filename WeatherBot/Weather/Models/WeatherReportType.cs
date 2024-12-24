@@ -8,7 +8,10 @@ public enum WeatherReportType
     // Open Meteo
     OpenMeteoDaily,
     OpenMeteoHourly,
-    OpenMeteoHourlyMultiHeight
+    OpenMeteoHourlyMultiHeight,
+
+    // AccuWeather
+    AccuWeatherHourly
 }
 
 public static class WeatherReportTypeExtensions
@@ -38,12 +41,37 @@ public static class WeatherReportTypeExtensions
             Type = WeatherReportType.OpenMeteoHourlyMultiHeight,
             Fetch = (lat, lon, _) => OpenMeteo.GetHourlyMultiHeight(lat, lon),
             Format = (weather, lang, page, now) => weather.FormatHourlyMultiHeight(lang, page, now)
+        },
+        ["aw_hourly"] = new WeatherReportTypeDefinition
+        {
+            Type = WeatherReportType.AccuWeatherHourly,
+            Fetch = AccuWeather.Get,
+            Format = (weather, lang, page, now) => weather.FormatHourly(lang, page, now)
         }
     };
 
-    public static string[][] ButtonOrder => App.Config.OpenWeatherMap != null
-        ? [["owm_hourly", "om_hourly"], ["om_daily", "om_heights"]]
-        : [["om_hourly", "om_daily", "om_heights"]];
+    public static IReadOnlyCollection<IReadOnlyCollection<string>> ButtonOrder
+    {
+        get
+        {
+            if (_buttonOrder == null)
+            {
+                var hourly = new List<string>();
+
+                if (App.Config.OpenWeatherMap != null)
+                    hourly.Add("owm_hourly");
+
+                hourly.Add("om_hourly");
+
+                if (App.Config.AccuWeather != null)
+                    hourly.Add("aw_hourly");
+
+                _buttonOrder = [hourly, ["om_daily", "om_heights"]];
+            }
+
+            return _buttonOrder;
+        }
+    }
 
     public static string GetKey(this WeatherReportType value) => TypeToKey[value];
 
@@ -74,4 +102,6 @@ public static class WeatherReportTypeExtensions
 
     private static readonly Dictionary<WeatherReportType, string> TypeToKey
         = All.ToDictionary(x => x.Value.Type, x => x.Key);
+
+    private static IReadOnlyCollection<IReadOnlyCollection<string>>? _buttonOrder;
 }

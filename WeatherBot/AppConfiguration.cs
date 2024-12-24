@@ -18,6 +18,7 @@ public class AppConfiguration
     public WeatherConfiguration Weather { get; init; } = new();
     public BookmarkConfiguration Bookmarks { get; init; } = new();
     public OpenWeatherMapConfiguration? OpenWeatherMap { get; init; }
+    public AccuWeatherConfiguration? AccuWeather { get; init; }
 
     public static AppConfiguration Initialize()
     {
@@ -63,6 +64,7 @@ public class AppConfiguration
             Weather.Validate();
             Bookmarks.Validate();
             OpenWeatherMap?.Validate();
+            AccuWeather?.Validate();
         }
         catch (Exception ex)
         {

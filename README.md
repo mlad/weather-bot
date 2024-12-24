@@ -11,17 +11,13 @@ Weather bot for Telegram Messenger with multiple APIs and bookmarks support.
 ## Features
 
 - Multiple APIs support:
-    - [Open Weather Map](https://openweathermap.org/api) (free, token required)
-    - [Open Meteo](https://open-meteo.com/) (free, no token required)
+    - [Open Weather Map](https://openweathermap.org/api)
+    - [Open-Meteo](https://open-meteo.com/)
+    - [AccuWeather](https://developer.accuweather.com/)
 - Different report types:
-    - Open Weather Map
-        - Current weather
-        - 3-hour forecast 5 days
-    - Open Meteo
-        - Current weather
-        - 7 days forecast
-        - 3-hour forecast 7 days
-        - Hourly forecast on different heights (10m, 80m, 120m and 180m)
+    - Daily forecast
+    - Current weather and hourly forecast
+    - Hourly forecast on different heights (10m, 80m, 120m and 180m)
 - Weather by location (using built-in Telegram location sharing)
 - Text location search (using [Open Meteo Geocoding API](https://open-meteo.com/en/docs/geocoding-api))
 - Beaufort Scale wind level display

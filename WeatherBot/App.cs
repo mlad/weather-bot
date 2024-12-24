@@ -17,7 +17,7 @@ using Emoji = WeatherBot.Text.Emoji;
 
 namespace WeatherBot;
 
-internal class App
+internal static class App
 {
     public static SQLiteConnection Database { get; private set; } = default!;
     public static AppConfiguration Config { get; private set; } = default!;
@@ -25,10 +25,10 @@ internal class App
 
     private static void Main()
     {
-        new App().MainAsync().GetAwaiter().GetResult();
+        MainAsync().GetAwaiter().GetResult();
     }
 
-    private async Task MainAsync()
+    private static async Task MainAsync()
     {
         Config = AppConfiguration.Initialize();
 
@@ -37,6 +37,7 @@ internal class App
         Database.CreateTable<WeatherLogEntity>();
         Database.CreateTable<BookmarkEntity>();
         Database.CreateTable<GeocodingLogEntity>();
+        Database.CreateTable<AccuWeatherLocationEntity>();
 
         Bot = new TelegramBotClient(Config.TelegramBotToken);
         var me = await Bot.GetMe();
@@ -153,7 +154,7 @@ internal class App
         };
     }
 
-    private async Task OnMessageHandler(Message message, UpdateType type)
+    private static async Task OnMessageHandler(Message message, UpdateType type)
     {
         if (message.From == null) return;
         var user = BotUser.GetOrCreate(message.From);
@@ -189,7 +190,7 @@ internal class App
         }
     }
 
-    private async Task OnUpdateHandler(Update update)
+    private static async Task OnUpdateHandler(Update update)
     {
         if (update is { CallbackQuery: { } query })
         {

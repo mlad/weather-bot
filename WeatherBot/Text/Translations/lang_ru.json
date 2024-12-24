@@ -73,6 +73,10 @@
     "om_heights": {
       "ShortName": "OM: высоты",
       "FullName": "Open Meteo: почасовой прогноз на разных высотах"
+    },
+    "aw_hourly": {
+      "ShortName": "AW: почасовой",
+      "FullName": "AccuWeather: почасовой прогноз"
     }
   },
   "Weather": {
