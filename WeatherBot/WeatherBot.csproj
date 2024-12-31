@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <PackageReference Include="CoordinateSharp" Version="3.1.1.1" />
+      <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="14.2.0" />
       <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
       <PackageReference Include="Telegram.Bot" Version="22.1.1" />
     </ItemGroup>
@@ -18,6 +19,39 @@
       <EmbeddedResource Include="Text\Translations\lang_ru.json" />
       <None Remove="Text\Translations\lang_en.json" />
       <EmbeddedResource Include="Text\Translations\lang_en.json" />
+      <None Update="Resources\emoji\cloud.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\emoji\fog.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\emoji\rain.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\emoji\snow.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\emoji\sun.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\emoji\sun-big-cloud.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\emoji\sun-small-cloud.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\emoji\thunderstorm.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\fonts\Roboto-Bold.ttf">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\fonts\Roboto-Regular.ttf">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\fonts\Roboto-Thin.ttf">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

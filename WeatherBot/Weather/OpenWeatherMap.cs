@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using WeatherBot.Text;
 using WeatherBot.Weather.Models;
 
 namespace WeatherBot.Weather;
@@ -65,7 +64,7 @@ public static class OpenWeatherMap
         {
             Time = DateTimeOffset.UtcNow.Hour(),
             WeatherName = Weather[0].Description,
-            WeatherIcon = Weather[0].GetEmoji(),
+            WeatherType = Weather[0].GetGenericWeatherType(),
             Humidity = Main.Humidity,
             Visibility = Visibility,
             Temperature = new Dictionary<int, double> { [0] = Main.Temp },
@@ -85,7 +84,7 @@ public static class OpenWeatherMap
             {
                 Time = DateTimeOffset.FromUnixTimeSeconds(d.TimeStamp),
                 WeatherName = d.Weather[0].Description,
-                WeatherIcon = d.Weather[0].GetEmoji(),
+                WeatherType = d.Weather[0].GetGenericWeatherType(),
                 Humidity = d.Main.Humidity,
                 Visibility = d.Visibility,
                 Temperature = new Dictionary<int, double> { [0] = d.Main.Temp },
@@ -113,21 +112,27 @@ public static class OpenWeatherMap
     [Serializable]
     public class WeatherModel
     {
+        public required int Id { get; init; }
+        public required string Main { get; init; }
         public required string Description { get; init; }
-        public required string Icon { get; init; }
 
-        public string GetEmoji() => Icon[..2] switch
+        public GenericWeatherType GetGenericWeatherType() => Main switch
         {
-            "01" => Emoji.ClearSky, // Clear sky
-            "02" => Emoji.FewClouds, // Few clouds
-            "03" => Emoji.Cloud, // Scattered clouds
-            "04" => Emoji.BrokenClouds, // Broken clouds
-            "09" => Emoji.Rain, // Shower rain
-            "10" => Emoji.Rain, // Rain
-            "11" => Emoji.Thunderstorm, // Thunderstorm
-            "13" => Emoji.Snow, // Snow
-            "50" => Emoji.Fog, // Mist
-            _ => string.Empty
+            "Clear" => GenericWeatherType.Clear,
+            "Clouds" => Id switch
+            {
+                801 => GenericWeatherType.FewClouds,
+                802 => GenericWeatherType.ScatteredClouds,
+                803 => GenericWeatherType.BrokenClouds,
+                804 => GenericWeatherType.OvercastClouds,
+                _ => throw new Exception($"OWM: unexpected weather id ({Id})")
+            },
+            "Drizzle" => GenericWeatherType.Rain,
+            "Rain" => GenericWeatherType.Rain,
+            "Thunderstorm" => GenericWeatherType.Thunderstorm,
+            "Snow" => GenericWeatherType.Snow,
+            "Atmosphere" => GenericWeatherType.Fog,
+            _ => throw new Exception($"OWM: unexpected weather group ({Main})")
         };
     }
 

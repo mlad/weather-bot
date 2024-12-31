@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using WeatherBot.Text;
 using WeatherBot.Weather.Database;
 using WeatherBot.Weather.Models;
 
@@ -61,40 +60,25 @@ public static class AccuWeather
         {
             Time = DateTime,
             WeatherName = IconPhrase,
-            WeatherIcon = WeatherIcon switch
+            WeatherType = WeatherIcon switch
             {
-                1 or 2 => Emoji.ClearSky,
-                3 or 4 => Emoji.FewClouds,
-                5 or 6 => Emoji.BrokenClouds,
-                7 or 8 => Emoji.Cloud,
-                11 => Emoji.Fog,
-                12 or 18 => Emoji.Rain,
-                13 => Emoji.BrokenClouds + Emoji.Rain,
-                14 => Emoji.FewClouds + Emoji.Rain,
-                15 => Emoji.Thunderstorm,
-                16 => Emoji.BrokenClouds + Emoji.Thunderstorm,
-                17 => Emoji.FewClouds + Emoji.Thunderstorm,
-                19 or 22 => Emoji.Snow,
-                20 or 23 => Emoji.BrokenClouds + Emoji.Snow,
-                21 => Emoji.FewClouds + Emoji.Snow,
-                24 => Emoji.Ice,
-                25 or 29 => Emoji.Rain + Emoji.Snow,
-                26 => Emoji.Ice + Emoji.Rain,
-                30 => Emoji.Hot,
-                31 => Emoji.Cold,
-                32 => Emoji.Wind,
-                33 or 34 => Emoji.Moon,
-                35 or 36 or 37 or 38 => Emoji.Moon + Emoji.Cloud,
-                39 or 40 => Emoji.Moon + Emoji.Rain,
-                41 or 42 => Emoji.Moon + Emoji.Thunderstorm,
-                43 or 44 => Emoji.Moon + Emoji.Snow,
-                _ => null
+                1 or 30 or 31 or 32 or 33 => GenericWeatherType.Clear,
+                2 or 34 => GenericWeatherType.FewClouds,
+                3 or 5 or 35 => GenericWeatherType.ScatteredClouds,
+                4 or 6 or 36 or 38 => GenericWeatherType.BrokenClouds,
+                7 or 8 => GenericWeatherType.OvercastClouds,
+                11 or 37 => GenericWeatherType.Fog,
+                12 or 13 or 14 or 18 or 26 or 39 or 40 => GenericWeatherType.Rain,
+                15 or 16 or 17 or 41 or 42 => GenericWeatherType.Thunderstorm,
+                19 or 20 or 21 or 22 or 23 or 24 or 25 or 29 or 43 or 44 => GenericWeatherType.Snow,
+                null => GenericWeatherType.Unknown,
+                _ => throw new Exception($"AW: unexpected weather icon id ({WeatherIcon})")
             },
             Humidity = RelativeHumidity,
             Visibility = Visibility.Value,
             Temperature = new Dictionary<int, double> { [0] = Temperature.Value },
             WindSpeed = new Dictionary<int, double> { [0] = Wind.Speed.Value * (5.0 / 18.0) }, // km/h to m/s
-            WindGusts = new Dictionary<int, double> { [0] = WindGust.Speed.Value * (5.0 / 18.0) }, // km/h to m/s
+            WindGusts = new Dictionary<int, double> { [0] = WindGust.Speed.Value * (5.0 / 18.0) } // km/h to m/s
         };
 
         [Serializable]

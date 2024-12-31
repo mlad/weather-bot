@@ -8,7 +8,7 @@ public class GenericWeatherResponse
 {
     public required double Latitude { get; init; }
     public required double Longitude { get; init; }
-    public required IReadOnlyCollection<GenericWeatherItem> Items { get; init; }
+    public required IReadOnlyList<GenericWeatherItem> Items { get; init; }
     public required TimeSpan UtcOffset { get; init; }
 
     public WeatherReportFormatResult FormatHourlyMultiHeight(string lang, int page, DateTime now)
@@ -161,7 +161,7 @@ public class GenericWeatherResponse
             sb.AddLine(
                 "Weather:Hourly:Item",
                 time,
-                w.WeatherIcon,
+                w.GetIconEmoji(),
                 (int)Math.Round(w.Temperature.MinBy(x => x.Key).Value),
                 wind,
                 WindLevel.Get(wind)
@@ -188,7 +188,7 @@ public class GenericWeatherResponse
                 "Weather:Daily:Item",
                 time,
                 Translator.Get(lang, $"Weekday:{time.ToString("dddd", CultureInfo.InvariantCulture)}"),
-                w.WeatherIcon,
+                w.GetIconEmoji(),
                 (int)Math.Round(w.Temperature.MinBy(x => x.Key).Value),
                 wind,
                 WindLevel.Get(wind)
@@ -258,9 +258,10 @@ public class GenericWeatherResponse
 
     private static void AppendWeatherName(TranslatedBuilder sb, GenericWeatherItem w)
     {
-        if (w.WeatherIcon != null)
+        var emoji = w.GetIconEmoji();
+        if (emoji != null)
         {
-            sb.AddRaw($"{w.WeatherIcon} ");
+            sb.AddRaw($"{emoji} ");
         }
 
         if (w.WeatherName.StartsWith('!'))

@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using WeatherBot.Text;
 using WeatherBot.Weather.Models;
 
 namespace WeatherBot.Weather;
@@ -63,7 +62,7 @@ public static class OpenMeteo
                 {
                     Time = DateTimeOffset.FromUnixTimeSeconds(t),
                     WeatherName = GetWeatherName(Hourly.WeatherCode[i]),
-                    WeatherIcon = GetWeatherEmoji(Hourly.WeatherCode[i]),
+                    WeatherType = GetGenericWeatherType(Hourly.WeatherCode[i]),
                     Humidity = Hourly.Humidity[i],
                     Visibility = Hourly.Visibility[i],
                     Temperature = new Dictionary<int, double> { [10] = Hourly.Temperature2M[i] }, // using 10m for consistency
@@ -124,7 +123,7 @@ public static class OpenMeteo
             {
                 Time = DateTimeOffset.FromUnixTimeSeconds(t),
                 WeatherName = GetWeatherName(Daily.WeatherCode[i]),
-                WeatherIcon = GetWeatherEmoji(Daily.WeatherCode[i]),
+                WeatherType = GetGenericWeatherType(Daily.WeatherCode[i]),
                 Temperature = new Dictionary<int, double> { [2] = (Daily.TemperatureMin[i] + Daily.TemperatureMax[i]) / 2 },
                 WindSpeed = new Dictionary<int, double> { [10] = Daily.WindSpeed[i] },
                 WindGusts = new Dictionary<int, double> { [10] = Daily.WindGusts[i] }
@@ -170,21 +169,16 @@ public static class OpenMeteo
         _ => "unknown"
     };
 
-    private static string GetWeatherEmoji(int code) => code switch
+    private static GenericWeatherType GetGenericWeatherType(int code) => code switch
     {
-        0 => Emoji.ClearSky,
-        1 or 2 or 3 => Emoji.FewClouds,
-        45 or 48 => Emoji.Fog,
-        51 or 53 or 55 => Emoji.Drizzle,
-        56 or 57 => Emoji.Snow + Emoji.Drizzle,
-        61 or 63 or 65 => Emoji.Rain,
-        66 or 67 => Emoji.Snow + Emoji.Rain,
-        71 or 73 or 75 => Emoji.Snow + Emoji.Snow + Emoji.Snow,
-        77 => Emoji.Snow,
-        80 or 81 or 82 => Emoji.Rain + Emoji.Rain,
-        85 or 86 => Emoji.Snow + Emoji.Snow,
-        95 => Emoji.Thunderstorm,
-        96 or 99 => Emoji.Thunderstorm + Emoji.Rock,
-        _ => string.Empty
+        0 => GenericWeatherType.Clear,
+        1 => GenericWeatherType.FewClouds,
+        2 => GenericWeatherType.ScatteredClouds,
+        3 => GenericWeatherType.OvercastClouds,
+        45 or 48 => GenericWeatherType.Fog,
+        51 or 53 or 55 or 56 or 57 or 61 or 63 or 65 or 66 or 67 or 80 or 81 or 82 => GenericWeatherType.Rain,
+        71 or 73 or 75 or 77 or 85 or 86 => GenericWeatherType.Snow,
+        95 or 96 or 99 => GenericWeatherType.Thunderstorm,
+        _ => throw new Exception($"OM: unexpected weather code ({code})")
     };
 }

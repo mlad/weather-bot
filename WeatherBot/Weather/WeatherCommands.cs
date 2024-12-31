@@ -84,7 +84,7 @@ public static class WeatherCommands
 
         var cached = WeatherLog.TryGet(cacheId) ?? throw new UserException("!Weather:Misc:CacheExpired");
 
-        var definition = cached.Request.Type.GetDefinition();
+        var definition = (BasicReportDefinition)cached.Request.Type.GetDefinition();
         var formatted = definition.Format(cached.Response, user.Language, page, query.Message!.Date);
 
         var bookmark = BookmarkEntity.TryGet(user.Id, cached.Request);
@@ -94,7 +94,7 @@ public static class WeatherCommands
             query.Message.MessageId,
             text: formatted.Message,
             parseMode: ParseMode.Html,
-            replyMarkup: GetWeatherMarkup(cached, formatted, bookmark?.Id)
+            replyMarkup: GetWeatherMarkup(cached.Request, formatted.Page, formatted.PageCount, bookmark?.Id, cached.Id)
         );
     }
 
@@ -121,62 +121,93 @@ public static class WeatherCommands
 
     #region Private
 
-    private static async Task HandleWeather(BotUser user, Chat chat, WeatherParams request,
-        ReplyParameters? reply = null, BookmarkEntity? bookmark = null)
+    private static Task HandleWeather(
+        BotUser user,
+        Chat chat,
+        WeatherParams request,
+        ReplyParameters? reply = null,
+        BookmarkEntity? bookmark = null)
     {
-        var def = request.Type.GetDefinition();
-        GenericWeatherResponse? response;
-
-        var cached = WeatherLog.TryGet(request);
-        if (cached != null)
+        return request.Type.GetDefinition() switch
         {
-            response = cached.Response;
+            BasicReportDefinition def => HandleBasic(def),
+            InheritedReportDefinition def => HandleInherited(def),
+            _ => throw new Exception($"Unexpected report definition type ({request.Type.GetDefinition().GetType()})")
+        };
+
+        async Task HandleBasic(BasicReportDefinition def)
+        {
+            var weather = await GetWeather(user, request);
+
+            var formatted = def.Format(weather.Response, user.Language, page: 0, DateTime.UtcNow);
+
+            await App.Bot.SendMessage(
+                chatId: chat,
+                text: formatted.Message,
+                replyParameters: reply,
+                parseMode: ParseMode.Html,
+                replyMarkup: GetWeatherMarkup(request, formatted.Page, formatted.PageCount, bookmark?.Id, weather.Id)
+            );
         }
-        else
-        {
-            var requestsInHour = WeatherLog.Count(user.Id, TimeSpan.FromHours(1));
-            var requestsQuota = user.RequestsQuota ?? App.Config.Users.DefaultRequestsQuota;
-            if (requestsInHour >= requestsQuota)
-            {
-                await App.Bot.SendMessage(chat, Translator.Format(user.Language, "Quota:Reached", requestsQuota));
-                return;
-            }
 
-            response = await def.Fetch(request.Lat, request.Lon, user.Language);
+        async Task HandleInherited(InheritedReportDefinition def)
+        {
+            var weather = await Task.WhenAll(
+                def.BaseTypes.Where(x => x.GetDefinition().IsAvailable()).Select(x => GetWeather(user, request.With(x)))
+            );
+
+            var image = def.Format(user, weather);
+
+            await App.Bot.SendPhoto(
+                chatId: chat,
+                photo: InputFile.FromStream(new MemoryStream(image)),
+                replyParameters: reply,
+                parseMode: ParseMode.Html,
+                replyMarkup: GetWeatherMarkup(request, page: 0, pageCount: 1, bookmark?.Id, cacheId: null)
+            );
+        }
+    }
+
+    private static async Task<WeatherLog> GetWeather(BotUser user, WeatherParams request)
+    {
+        var cached = WeatherLog.TryGet(request);
+        if (cached == null)
+        {
+            var def = (BasicReportDefinition)request.Type.GetDefinition();
+            var response = await def.Fetch(request.Lat, request.Lon, user.Language);
             cached = WeatherLog.Create(user.Id, request, response);
         }
 
-        var formatted = def.Format(response, user.Language, page: 0, DateTime.UtcNow);
-
-        await App.Bot.SendMessage(
-            chatId: chat,
-            text: formatted.Message,
-            replyParameters: reply,
-            parseMode: ParseMode.Html,
-            replyMarkup: GetWeatherMarkup(cached, formatted, bookmark?.Id)
-        );
+        return cached;
     }
 
-    private static InlineKeyboardMarkup GetWeatherMarkup(WeatherLog weather, WeatherReportFormatResult formatted,
-        int? bookmarkId)
+    private static InlineKeyboardMarkup GetWeatherMarkup(
+        WeatherParams request,
+        int page,
+        int pageCount,
+        int? bookmarkId,
+        int? cacheId)
     {
         var markup = new InlineKeyboardMarkup();
 
-        if (formatted.PageCount > 1)
+        if (pageCount > 1 && cacheId != null)
         {
-            markup.AddButton($"{formatted.Page + 1} / {formatted.PageCount}", $"WeatherPage {weather.Id} {formatted.Page + 1}");
+            markup.AddButton($"{page + 1} / {pageCount}", $"WeatherPage {cacheId} {page + 1}");
         }
 
-        markup.AddButton(Emoji.Refresh, $"Weather {weather.Request}");
+        markup.AddButton(Emoji.Refresh, $"Weather {request}");
 
-        markup.AddButton(Emoji.TwistedArrows, $"WeatherSetType {weather.Request}");
+        markup.AddButton(Emoji.TwistedArrows, $"WeatherSetType {request}");
 
         markup.AddButton(bookmarkId == null
-            ? new InlineKeyboardButton(Emoji.Star) { CallbackData = $"AddBookmark {weather.Request}" }
+            ? new InlineKeyboardButton(Emoji.Star) { CallbackData = $"AddBookmark {request}" }
             : new InlineKeyboardButton(Emoji.TrashBin) { CallbackData = $"DeleteBookmark {bookmarkId}" }
         );
 
-        markup.AddButton(Emoji.Info, $"WeatherInfo {weather.Id}");
+        if (cacheId != null)
+        {
+            markup.AddButton(Emoji.Info, $"WeatherInfo {cacheId}");
+        }
 
         return markup;
     }

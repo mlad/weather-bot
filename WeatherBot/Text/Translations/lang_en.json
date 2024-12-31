@@ -77,6 +77,10 @@
     "aw_hourly": {
       "ShortName": "AW: hourly",
       "FullName": "AccuWeather: hourly forecast"
+    },
+    "combined_hourly": {
+      "ShortName": "📊 Hourly",
+      "FullName": "Table: hourly"
     }
   },
   "Weather": {
@@ -123,6 +127,13 @@
       "Temperature": "Temperature: {0}\u00b0C",
       "WindSpeed": "Wind speed: {0:0.#} m/s (level {1})",
       "WindGust": "Wind gusts: {0:0.#} m/s (level {1})"
+    },
+    "CombinedHourly": {
+      "TimeHeader": "Time",
+      "Time": "{0:HH:mm}",
+      "Meter": "{0}m:",
+      "Temp": "{0}\u00b0C",
+      "Wind": "{0:0.#} m/s ({1})"
     },
     "Misc": {
       "SetTypePrompt": "Select type:",
