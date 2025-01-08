@@ -33,11 +33,19 @@ Weather bot for Telegram Messenger with multiple APIs and bookmarks support.
 
 1. Install [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) for your platform
 2. Download the [latest release](https://github.com/mlad/weather-bot/releases) or [build it yourself](#building), unpack the archive
-3. Run `WeatherBot` (Linux) or `WeatherBot.exe` (Windows), the app will create `configuration.json` file and exit
+3. Run `WeatherBot[.exe]`, the app will create `configuration.json` file and exit
 4. Open created configuration file and fill the following properties:
-    - `TelegramBotToken` with a Telegram bot API token (can be obtained from [@BotFather](https://t.me/BotFather) bot)
-    - `OpenWeatherMap:ApiToken` with Open Weather Map API token (register [here](https://home.openweathermap.org/users/sign_up)), or completely remove `OpenWeatherMap` section
-    - `AccuWeather:ApiToken` with AccuWeather API token (register [here](https://developer.accuweather.com/user/register)), or completely remove `AccuWeather` section
+```jsonc
+{
+  "TelegramBotToken": "", // Telegram bot API token (get from @BotFather)
+  "OpenWeatherMap": {
+    "ApiToken": "" // Optionally, OpenWeatherMap token (or completely remove "OpenWeatherMap" section)
+  },
+  "AccuWeather": {
+    "ApiToken": "" // Optionally, AccuWeather token (or completely remove "AccuWeather" section)
+  }
+}
+```
 5. Run the application again. If authorization is successful, console will display "Logged-in as {bot name}"
 6. Send `/start` or `/help` to the bot to get list of commands. Share a location to get weather
 
