@@ -6,9 +6,10 @@ namespace WeatherBot.Weather.Database;
 [Table("AccuWeatherLocations")]
 public class AccuWeatherLocationEntity
 {
-    [PrimaryKey] public int Id { get; set; }
+    [PrimaryKey, AutoIncrement] public int Id { get; set; }
     public double Lat { get; set; }
     public double Lon { get; set; }
+    public int LocationKey { get; set; }
     public DateTime CreateTimeUtc { get; set; }
 
     public static AccuWeatherLocationEntity? TryGet(double lat, double lon)
@@ -19,13 +20,13 @@ public class AccuWeatherLocationEntity
         );
     }
 
-    public static AccuWeatherLocationEntity Create(int id, double lat, double lon)
+    public static AccuWeatherLocationEntity Create(double lat, double lon, int key)
     {
         var entity = new AccuWeatherLocationEntity
         {
-            Id = id,
             Lat = lat,
             Lon = lon,
+            LocationKey = key,
             CreateTimeUtc = DateTime.UtcNow
         };
 

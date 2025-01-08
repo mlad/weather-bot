@@ -13,11 +13,11 @@ public static class AccuWeather
     {
         using var http = new HttpClient();
 
-        var locationKey = AccuWeatherLocationEntity.TryGet(lat, lon)?.Id.ToString();
+        var locationKey = AccuWeatherLocationEntity.TryGet(lat, lon)?.LocationKey.ToString();
         if (locationKey == null)
         {
             locationKey = (await GetAsync<LocationResponse>(http, $"{GeoSearchEndpoint}?q={lat},{lon}")).Key;
-            AccuWeatherLocationEntity.Create(int.Parse(locationKey), lat, lon);
+            AccuWeatherLocationEntity.Create(lat, lon, int.Parse(locationKey));
         }
 
         var forecast = await GetAsync<List<ForecastResponseItem>>(http,

@@ -113,26 +113,25 @@ public static class OpenWeatherMap
     public class WeatherModel
     {
         public required int Id { get; init; }
-        public required string Main { get; init; }
         public required string Description { get; init; }
 
-        public GenericWeatherType GetGenericWeatherType() => Main switch
+        // Reference: https://openweathermap.org/weather-conditions
+        public GenericWeatherType GetGenericWeatherType() => (Id / 100) switch
         {
-            "Clear" => GenericWeatherType.Clear,
-            "Clouds" => Id switch
+            2 => GenericWeatherType.Thunderstorm, // 2xx: Thunderstorm
+            3 => GenericWeatherType.Rain, // 3xx: Drizzle
+            5 => GenericWeatherType.Rain, // 5xx: Rain
+            6 => GenericWeatherType.Snow, // 6xx: Snow
+            7 => GenericWeatherType.Fog, // 7xx: Atmosphere
+            _ => Id switch
             {
+                800 => GenericWeatherType.Clear,
                 801 => GenericWeatherType.FewClouds,
                 802 => GenericWeatherType.ScatteredClouds,
                 803 => GenericWeatherType.BrokenClouds,
                 804 => GenericWeatherType.OvercastClouds,
                 _ => throw new Exception($"OWM: unexpected weather id ({Id})")
-            },
-            "Drizzle" => GenericWeatherType.Rain,
-            "Rain" => GenericWeatherType.Rain,
-            "Thunderstorm" => GenericWeatherType.Thunderstorm,
-            "Snow" => GenericWeatherType.Snow,
-            "Atmosphere" => GenericWeatherType.Fog,
-            _ => throw new Exception($"OWM: unexpected weather group ({Main})")
+            }
         };
     }
 
