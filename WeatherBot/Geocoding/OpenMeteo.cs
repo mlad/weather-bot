@@ -27,7 +27,6 @@ public static class OpenMeteo
         public class Item
         {
             public required string Name { get; init; }
-            public required string Country { get; init; }
             public required string CountryCode { get; init; }
             public required double Latitude { get; init; }
             public required double Longitude { get; init; }
@@ -35,7 +34,6 @@ public static class OpenMeteo
             public GenericGeocodingResponse ToGeneric() => new()
             {
                 Name = Name,
-                CountryName = Country,
                 CountryCode = CountryCode,
                 Latitude = Latitude,
                 Longitude = Longitude
