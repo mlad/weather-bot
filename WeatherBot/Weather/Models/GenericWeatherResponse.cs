@@ -200,31 +200,26 @@ public class GenericWeatherResponse
 
     private void AppendTimeDetails(TranslatedBuilder sb, string lang, DateTimeOffset now)
     {
-        sb.AddLine("Weather:Generic:LocalTime", now.ToOffset(UtcOffset));
+        var localTime = now.ToOffset(UtcOffset).DateTime;
+        sb.AddLine("Weather:Generic:LocalTime", localTime);
 
-        var location = new Coordinate(Latitude, Longitude, now.UtcDateTime);
+        var celestial = new Celestial(Latitude, Longitude, localTime, UtcOffset.TotalHours);
+        var sunrise = celestial.SunRise;
+        var sunset = celestial.SunSet;
 
-        DateTimeOffset? sunrise = location.CelestialInfo.SunRise != null
-            ? new DateTimeOffset(location.CelestialInfo.SunRise.Value, TimeSpan.Zero)
-            : null;
-
-        DateTimeOffset? sunset = location.CelestialInfo.SunSet != null
-            ? new DateTimeOffset(location.CelestialInfo.SunSet.Value, TimeSpan.Zero)
-            : null;
-
-        if (now < sunrise)
+        if (localTime < sunrise)
         {
-            var timeUntilSunrise = sunrise.Value - now;
-            sb.AddLine("Weather:Generic:Sunrise", sunrise.Value.ToOffset(UtcOffset), timeUntilSunrise.Format(lang));
+            var timeUntilSunrise = sunrise.Value - localTime;
+            sb.AddLine("Weather:Generic:Sunrise", sunrise.Value, timeUntilSunrise.Format(lang));
         }
-        else if (now < sunset)
+        else if (localTime < sunset)
         {
-            var timeUntilSunset = sunset.Value - now;
-            sb.AddLine("Weather:Generic:Sunset", sunset.Value.ToOffset(UtcOffset), timeUntilSunset.Format(lang));
+            var timeUntilSunset = sunset.Value - localTime;
+            sb.AddLine("Weather:Generic:Sunset", sunset.Value, timeUntilSunset.Format(lang));
         }
         else if (sunset != null)
         {
-            sb.AddLine("Weather:Generic:SunsetAlready", sunset.Value.ToOffset(UtcOffset));
+            sb.AddLine("Weather:Generic:SunsetAlready", sunset.Value);
         }
     }
 
